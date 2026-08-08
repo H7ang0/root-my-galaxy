@@ -474,7 +474,7 @@ private fun consoleAnnotated(output: String): AnnotatedString {
         }
         builder.pushStyle(SpanStyle(color = color, fontWeight = FontWeight.Bold))
         builder.append(line)
-        builder.popStyle()
+        builder.pop()
         builder.append("\n")
     }
     return builder.toAnnotatedString()
