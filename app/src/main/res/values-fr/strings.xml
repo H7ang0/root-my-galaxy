@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Root My Galaxy</string>
+    <string name="app_name">Nothing Galaxy Root</string>
     <string name="nav_overview">Accueil</string>
     <string name="nav_history">Historique</string>
     <string name="nav_settings">Paramètres</string>
@@ -136,9 +136,9 @@
     <string name="kernel_version_mismatch_title">Incompatibilité de version de noyau</string>
     <string name="kernel_version_mismatch_body">Ce téléphone utilise le noyau %1$s, mais la charge utile sélectionnée prend en charge %2$s. Les décalages peuvent être incompatibles.</string>
     <string name="about">À propos</string>
-    <string name="about_title">À propos de Root My Galaxy</string>
-    <string name="about_description">À propos de Root My Galaxy</string>
-    <string name="about_body">Installeur en un clic qui exploite une faille du noyau pour rooter les appareils Samsung Galaxy pris en charge.</string>
+    <string name="about_title">About Nothing Galaxy Root</string>
+    <string name="about_description">About Nothing Galaxy Root</string>
+    <string name="about_body">Author: H7ang0, developed based on Root-My-Galaxy.\nFor the user group, add H7ang0 on WeChat and state your purpose.</string>
     <string name="history_payload">Payload : %1$s</string>
     <string name="export_log">Exporter le journal</string>
     <string name="export_log_saved">Journal enregistré</string>

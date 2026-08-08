@@ -1,31 +1,28 @@
-# Root My Galaxy
+# Nothing Galaxy Root
 
 <img width="108" height="108" alt="sprout_icon_108" src="https://github.com/user-attachments/assets/2ba0e360-0876-489c-b256-f75df7589785" />
 
+作者：H7ang0，基于 Root-My-Galaxy 开发。
+交流群请加 H7ang0 微信，备注来意。
 
-Root My Galaxy is a one-click installer for explicitly
-supported Samsung model and kernel combinations. The application itself is kept separate
-from device offsets, native exploit payloads, and KernelSU build artifacts.
+Nothing Galaxy Root 是 Galaxy S24 Ultra（国行）的一键 root 安装器，
+仅支持以下设备与固件：
 
+```text
+model:   SM-S9280
+firmware: S9280ZCS6DZF2 (CHC / 国行)
+kernel:  6.1.145-android14-11-3254743-abS9280ZCS6DZF2
+```
 
-[Latest release](https://github.com/BuSung-dev/Root-My-Galaxy/releases)
+应用与设备偏移、native exploit payload、KernelSU 构建产物分离；
+本版本不再从网络拉取支持清单，payload 直接内置在 APK 的 assets 中。
 
-The device feed and native payloads are maintained in
-[Root-My-Galaxy-Payloads](https://github.com/BuSung-dev/Root-My-Galaxy-Payloads).
+## 界面
 
-## Application
+安装界面为 iOS 越狱风格的终端控制台（黑色背景、彩色日志前缀、
+ASCII 启动画面、闪烁光标）。
 
-
-<img width="200" alt="KakaoTalk_20260718_170922353" src="https://github.com/user-attachments/assets/3f562ea4-8c39-4ade-bfd3-93eea1a1cc24" />
-<img width="200" alt="KakaoTalk_20260718_171127319" src="https://github.com/user-attachments/assets/8dde0443-12cf-4058-ba76-0337aefb92a0" />
-<img width="200" alt="KakaoTalk_20260718_171030202" src="https://github.com/user-attachments/assets/f656e8af-60a6-4fcb-a3db-d4232bede613" />
-
-The app selects a payload whose model list and three-part kernel version match
-the phone. For example, `6.6.98-android15-8-...` matches `6.6.98`. Advanced
-mode filters the catalog by both values and allows manual selection with model
-and kernel-version warnings.
-
-## Build
+## 构建
 
 Requirements:
 
@@ -39,10 +36,10 @@ $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
 .\gradlew.bat :app:assembleDebug
 ```
 
-Output:
+输出:
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Use only on devices you own or are explicitly authorized to test.
+仅在您拥有或明确获准测试的设备上使用。

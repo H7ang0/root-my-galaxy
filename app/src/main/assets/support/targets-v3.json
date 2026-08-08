@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 3,
+  "payloads": [
+    {
+      "payloadId": "e3q-S9280ZCS6DZF2",
+      "displayName": "Galaxy S24 Ultra (SM-S9280) | Kernel 6.1.145 [offline]",
+      "models": [
+        "SM-S9280"
+      ],
+      "kernelVersions": [
+        "6.1.145"
+      ],
+      "exploit": {
+        "url": "asset://e3q-S9280ZCS6DZF2/cve-2026-43499-app.so",
+        "size": 104128
+      },
+      "kernelsu": {
+        "url": "asset://e3q-S9280ZCS6DZF2/ksud-s9280-kdp",
+        "size": 4879856
+      }
+    }
+  ]
+}

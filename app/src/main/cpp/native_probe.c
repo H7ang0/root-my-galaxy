@@ -115,7 +115,7 @@ static void append_kaslr_timing_probe(char *output, size_t output_size) {
 #endif
 
 JNIEXPORT jstring JNICALL
-Java_dev_busung_s25uroot_NativeProbe_run(JNIEnv *env, jobject thiz) {
+Java_com_h7ang0_root_NativeProbe_run(JNIEnv *env, jobject thiz) {
   (void)thiz;
   char output[8192] = {0};
   char context[256] = "unknown";
@@ -252,7 +252,7 @@ Java_dev_busung_s25uroot_NativeProbe_run(JNIEnv *env, jobject thiz) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_dev_busung_s25uroot_NativeProbe_isKernelSuActive(JNIEnv *env,
+Java_com_h7ang0_root_NativeProbe_isKernelSuActive(JNIEnv *env,
                                                        jobject thiz) {
   (void)env;
   (void)thiz;

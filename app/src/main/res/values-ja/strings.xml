@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Root My Galaxy</string><string name="nav_overview">ホーム</string><string name="nav_history">実行履歴</string><string name="nav_settings">設定</string>
+    <string name="app_name">Nothing Galaxy Root</string><string name="nav_overview">ホーム</string><string name="nav_history">実行履歴</string><string name="nav_settings">設定</string>
     <string name="install_confirm_title">KernelSUをインストールしますか？</string><string name="install_confirm_body">対応プロファイルを確認し、exploitとKernelSU payloadをGitHubから取得して実行します。</string>
     <string name="action_confirm">確認</string><string name="action_cancel">キャンセル</string><string name="action_close">閉じる</string><string name="action_retry">再試行</string><string name="action_done">完了</string><string name="action_back">戻る</string>
     <string name="install_tap_manager">タップしてKernelSU Managerをインストール</string><string name="install_tap_retry">タップして再試行</string><string name="install_tap_start">タップしてKernelSUをインストール</string>
@@ -27,9 +27,9 @@
     <string name="device_mismatch_title">デバイスが一致しません</string><string name="device_mismatch_body">現在のデバイスは%1$sですが、選択したpayloadは%2$sに対応しています。実行すると端末が停止または破損する可能性があります。</string>
     <string name="kernel_version_mismatch_title">カーネルバージョンが一致しません</string><string name="kernel_version_mismatch_body">現在のカーネルは%1$sですが、選択したpayloadは%2$sに対応しています。オフセットに互換性がない可能性があります。</string>
     <string name="about">アプリ情報</string>
-    <string name="about_title">Root My Galaxy について</string>
-    <string name="about_description">Root My Galaxyについて</string>
-    <string name="about_body">対応Samsung Galaxy端末をカーネル脆弱性を利用してワンクリックでroot化するインストーラーです。</string>
+    <string name="about_title">About Nothing Galaxy Root</string>
+    <string name="about_description">About Nothing Galaxy Root</string>
+    <string name="about_body">Author: H7ang0, developed based on Root-My-Galaxy.\nFor the user group, add H7ang0 on WeChat and state your purpose.</string>
     <string name="history_payload">Payload: %1$s</string>
     <string name="export_log">ログをエクスポート</string>
     <string name="export_log_saved">ログを保存しました</string>

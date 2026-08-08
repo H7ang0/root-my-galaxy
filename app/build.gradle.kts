@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.busung.s25uroot"
+    namespace = "com.h7ang0.root"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "dev.busung.s25uroot"
+        applicationId = "com.h7ang0.root"
         minSdk = 33
         targetSdk = 36
         versionCode = 12

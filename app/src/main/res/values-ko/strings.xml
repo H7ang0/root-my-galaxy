@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Root My Galaxy</string>
+    <string name="app_name">Nothing Galaxy Root</string>
     <string name="nav_overview">홈</string><string name="nav_history">실행 기록</string><string name="nav_settings">설정</string>
     <string name="install_confirm_title">KernelSU를 설치할까요?</string><string name="install_confirm_body">지원 프로필을 확인한 뒤 exploit과 KernelSU payload를 GitHub에서 받아 실행합니다.</string>
     <string name="action_confirm">확인</string><string name="action_cancel">취소</string><string name="action_close">닫기</string><string name="action_retry">다시 시도</string><string name="action_done">완료</string><string name="action_back">뒤로</string>
@@ -28,9 +28,9 @@
     <string name="device_mismatch_title">기기가 일치하지 않습니다</string><string name="device_mismatch_body">현재 기기는 %1$s이지만 선택한 payload는 %2$s을(를) 지원합니다. 실행하면 기기가 멈추거나 손상될 수 있습니다.</string>
     <string name="kernel_version_mismatch_title">커널 버전이 일치하지 않습니다</string><string name="kernel_version_mismatch_body">현재 커널은 %1$s이지만 선택한 payload는 %2$s을(를) 지원합니다. 오프셋이 호환되지 않을 수 있습니다.</string>
     <string name="about">정보</string>
-    <string name="about_title">Root My Galaxy 정보</string>
-    <string name="about_description">Root My Galaxy 정보</string>
-    <string name="about_body">한 번의 클릭으로 지원되는 삼성 Galaxy 기기를 커널 익스플로잇을 이용해 루팅하는 설치기입니다.</string>
+    <string name="about_title">About Nothing Galaxy Root</string>
+    <string name="about_description">About Nothing Galaxy Root</string>
+    <string name="about_body">Author: H7ang0, developed based on Root-My-Galaxy.\nFor the user group, add H7ang0 on WeChat and state your purpose.</string>
     <string name="history_payload">Payload: %1$s</string>
     <string name="export_log">로그 내보내기</string>
     <string name="export_log_saved">로그가 저장되었습니다</string>

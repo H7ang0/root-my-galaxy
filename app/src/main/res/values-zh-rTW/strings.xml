@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Root My Galaxy</string>
+    <string name="app_name">Nothing Galaxy Root</string>
     <string name="nav_overview">首頁</string>
     <string name="nav_history">執行紀錄</string>
     <string name="nav_settings">設定</string>
@@ -11,12 +11,12 @@
     <string name="action_confirm">確認</string>
     <string name="action_cancel">取消</string>
     <string name="action_close">關閉</string>
-    <string name="action_retry">重試</string>
+    <string name="action_retry">重試</string><string name="action_start_temp_root">啟動臨時Root</string>
     <string name="action_done">完成</string>
     <string name="action_back">返回</string>
 
     <string name="install_tap_manager">點擊安裝 KernelSU Manager</string>
-    <string name="install_tap_retry">點擊重試</string>
+    <string name="install_tap_retry">點擊啟動臨時Root</string>
     <string name="install_tap_start">點擊安裝 KernelSU</string>
 
     <string name="device">裝置</string>
@@ -150,9 +150,11 @@
     <string name="kernel_version_mismatch_title">核心版本不相符</string>
     <string name="kernel_version_mismatch_body">目前的核心為 %1$s，但所選的 payload 支援 %2$s。偏移量可能不相容。</string>
     <string name="about">關於</string>
-    <string name="about_title">關於 Root My Galaxy</string>
-    <string name="about_description">關於 Root My Galaxy</string>
-    <string name="about_body">一鍵安裝器，利用核心漏洞對受支援的三星 Galaxy 裝置進行 root。</string>
+    <string name="about_title">關於 Nothing Galaxy Root</string>
+    <string name="about_description">關於 Nothing Galaxy Root</string>
+    <string name="about_body">作者：H7ang0，基於 Root-My-Galaxy 開發。\n交流群請加 H7ang0 微信，備註來意。</string>
+    <string name="about_contact">交流群：微信添加 H7ang0，備註來意。</string>
+    <string name="about_target">本版本僅支援 SM-S9280 / S9280ZCS6DZF2。</string>
     <string name="history_payload">Payload: %1$s</string>
     <string name="export_log">匯出日誌</string>
     <string name="export_log_saved">日誌已儲存</string>
