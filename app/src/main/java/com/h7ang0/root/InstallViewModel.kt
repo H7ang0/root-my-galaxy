@@ -84,7 +84,7 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
                 return@launch
             }
             try {
-                val profile = repository.resolveTarget(DeviceSnapshot.current())
+                val profile = repository.resolveTarget(DeviceSnapshot.current(app))
                 mutableState.value = InstallUiState(
                     phase = InstallPhase.Ready,
                     message = app.getString(R.string.status_not_installed),
@@ -143,7 +143,7 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
                 }
                 setPhase(InstallPhase.Checking, app.getString(R.string.status_checking_profile))
                 val profile = if (profileId == null) {
-                    repository.resolveTarget(DeviceSnapshot.current())
+                    repository.resolveTarget(DeviceSnapshot.current(app))
                 } else {
                     repository.resolveTarget(profileId)
                 }

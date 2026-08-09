@@ -24,6 +24,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -108,6 +111,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
@@ -121,15 +126,19 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.h7ang0.root.ui.theme.NothingGalaxyRootTheme
+import com.h7ang0.root.ui.theme.RootMyGalaxyTheme
 import com.h7ang0.root.ui.theme.DotMatrixFont
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -155,7 +164,7 @@ class MainActivity : ComponentActivity() {
         advancedMode = AppPreferences.advancedMode(this)
         shizukuMode = AppPreferences.shizukuMode(this)
         setContent {
-            NothingGalaxyRootTheme(accentColor = accentColor, themeMode = themeMode) {
+            RootMyGalaxyTheme(accentColor = accentColor, themeMode = themeMode) {
                 RootApp(
                     installViewModel = installViewModel,
                     accentColor = accentColor,
@@ -273,7 +282,18 @@ private fun RootApp(
     var showTargetPicker by remember { mutableStateOf(false) }
     var selectedProfile by remember { mutableStateOf<TargetProfile?>(null) }
     var compatibilityWarning by remember { mutableStateOf<CompatibilityWarning?>(null) }
-    val device = remember { DeviceSnapshot.current() }
+    val context = LocalContext.current
+    val device = remember { DeviceSnapshot.current(context) }
+
+    val startInstall = {
+        selectedProfile = null
+        if (advancedMode) {
+            showTargetPicker = true
+            installViewModel.loadTargetCatalog()
+        } else {
+            showInstallConfirmation = true
+        }
+    }
 
     if (showTargetPicker) {
         TargetSelectionSheet(
@@ -385,53 +405,46 @@ private fun RootApp(
         )
     }
 
+    BackHandler(enabled = selectedPage != AppPage.Overview) {
+        selectedPage = AppPage.Overview
+    }
+
     Scaffold(
-        bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                tonalElevation = 0.dp,
-            ) {
-                AppPage.entries.forEach { page ->
-                    NavigationBarItem(
-                        selected = selectedPage == page,
-                        onClick = { selectedPage = page },
-                        modifier = Modifier.padding(top = 4.dp),
-                        icon = { Icon(page.icon, contentDescription = null) },
-                        label = { Text(stringResource(page.label)) },
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            WatermarkBackground(
+                word = "galaxy",
+                modifier = Modifier.fillMaxSize(),
+            )
+            AnimatedContent(targetState = selectedPage, label = "page") { page ->
+                when (page) {
+                    AppPage.Overview -> BootScreen(
+                        padding = padding,
+                        device = device,
+                        installState = installState,
+                        onInstall = startInstall,
+                        onHistory = { selectedPage = AppPage.History },
+                        onSettings = { selectedPage = AppPage.Settings },
+                    )
+                    AppPage.History -> HistoryPage(
+                        padding = padding,
+                        history = history,
+                        onBack = { selectedPage = AppPage.Overview },
+                    )
+                    AppPage.Settings -> SettingsPage(
+                        padding = padding,
+                        accentColor = accentColor,
+                        themeMode = themeMode,
+                        advancedMode = advancedMode,
+                        shizukuMode = shizukuMode,
+                        onBack = { selectedPage = AppPage.Overview },
+                        onAccentColorChanged = onAccentColorChanged,
+                        onThemeModeChanged = onThemeModeChanged,
+                        onAdvancedModeChanged = onAdvancedModeChanged,
+                        onShizukuModeChanged = onShizukuModeChanged,
                     )
                 }
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-    ) { padding ->
-        AnimatedContent(targetState = selectedPage, label = "page") { page ->
-            when (page) {
-                AppPage.Overview -> OverviewPage(
-                    padding = padding,
-                    device = device,
-                    installState = installState,
-                    onInstall = {
-                        selectedProfile = null
-                        if (advancedMode) {
-                            showTargetPicker = true
-                            installViewModel.loadTargetCatalog()
-                        } else {
-                            showInstallConfirmation = true
-                        }
-                    },
-                )
-                AppPage.History -> HistoryPage(padding, history)
-                AppPage.Settings -> SettingsPage(
-                    padding = padding,
-                    accentColor = accentColor,
-                    themeMode = themeMode,
-                    advancedMode = advancedMode,
-                    shizukuMode = shizukuMode,
-                    onAccentColorChanged = onAccentColorChanged,
-                    onThemeModeChanged = onThemeModeChanged,
-                    onAdvancedModeChanged = onAdvancedModeChanged,
-                    onShizukuModeChanged = onShizukuModeChanged,
-                )
             }
         }
     }
@@ -444,219 +457,191 @@ private fun DialogDimAmount(amount: Float) {
 }
 
 @Composable
-private fun OverviewPage(
+private fun BootScreen(
     padding: PaddingValues,
     device: DeviceSnapshot,
     installState: InstallUiState,
     onInstall: () -> Unit,
+    onHistory: () -> Unit,
+    onSettings: () -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 54.dp, bottom = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_app_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp),
-                )
-                Text(
-                    text = stringResource(R.string.app_name),
-                    fontFamily = DotMatrixFont,
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = stringResource(
-                        R.string.version_format,
-                        BuildConfig.VERSION_NAME,
-                        BuildConfig.VERSION_CODE,
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
-                )
-            }
-        }
-        item { InstallStatusCard(installState, onInstall) }
-        item { DeviceCard(device) }
-        item { HowItWorksCard() }
-    }
-}
-
-@Composable
-private fun HowItWorksCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Text(stringResource(R.string.how_it_works), style = MaterialTheme.typography.titleMedium)
-            installerSteps.forEach { step ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Surface(
-                        modifier = Modifier.size(36.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(step.icon, contentDescription = null, modifier = Modifier.size(20.dp))
-                        }
-                    }
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(step.title), style = MaterialTheme.typography.titleSmall)
-                        Text(
-                            stringResource(step.detail),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Unit) {
     val context = LocalContext.current
-    val interactionSource = remember { MutableInteractionSource() }
     val uriHandler = LocalUriHandler.current
     val managerInstalled = remember(installState) { isKernelSuManagerInstalled(context) }
-    Card(
-        onClick = {
-            when {
-                installState.busy -> Unit
-                installState.phase == InstallPhase.Installed -> {
-                    if (managerInstalled) {
+    val installed = installState.phase == InstallPhase.Installed
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(horizontal = 28.dp),
+    ) {
+        Spacer(modifier = Modifier.weight(0.30f))
+
+        val accent = MaterialTheme.colorScheme.primary
+        val appName = stringResource(R.string.app_name).uppercase(Locale.getDefault())
+        Text(
+            text = buildAnnotatedString {
+                append(appName)
+                withStyle(SpanStyle(color = accent)) { append(".") }
+            },
+            fontFamily = DotMatrixFont,
+            style = MaterialTheme.typography.displaySmall,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = stringResource(R.string.boot_tagline),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(modifier = Modifier.height(22.dp))
+        NeofetchBlock(device)
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = when {
+                installState.busy -> installState.message
+                installed -> stringResource(R.string.status_ksu_active)
+                else -> stringResource(R.string.boot_hint)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (installState.busy) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+        )
+
+        Spacer(modifier = Modifier.weight(0.42f))
+
+        BootMenuItem(
+            label = when {
+                installState.busy -> installState.message
+                installed && managerInstalled -> stringResource(R.string.boot_menu_open_manager)
+                installed -> stringResource(R.string.boot_menu_install_manager)
+                installState.phase == InstallPhase.Failed -> stringResource(R.string.boot_menu_retry)
+                else -> stringResource(R.string.boot_menu_root)
+            },
+            highlighted = true,
+            enabled = !installState.busy,
+            onClick = {
+                when {
+                    installState.busy -> Unit
+                    installed -> if (managerInstalled) {
                         openKernelSuManager(context)
                     } else {
                         uriHandler.openUri(KERNEL_SU_MANAGER_URL)
                     }
+                    else -> onInstall()
                 }
-                else -> onInstall()
-            }
-        },
-        modifier = Modifier.fillMaxWidth().animateContentSize(),
-        shape = expressiveClickableCardShape(interactionSource),
-        interactionSource = interactionSource,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            when {
-                installState.busy -> LoadingIndicator(
-                    modifier = Modifier.size(44.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                installState.phase == InstallPhase.Installed -> Icon(
-                    Icons.Rounded.CheckCircle, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
-                installState.phase == InstallPhase.Failed -> Icon(
-                    Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
-                else -> Icon(
-                    Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(44.dp),
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                if (installState.phase == InstallPhase.Installed) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_kernelsu),
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                        Text(
-                            text = stringResource(R.string.status_ksu_active),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
-                } else {
-                    Text(
-                        text = when (installState.phase) {
-                            InstallPhase.Ready -> stringResource(R.string.status_not_installed)
-                            else -> installState.message
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-                Text(
-                    text = when (installState.phase) {
-                        InstallPhase.Installed -> stringResource(
-                            if (managerInstalled) {
-                                R.string.install_tap_open_manager
-                            } else {
-                                R.string.install_tap_manager
-                            },
-                        )
-                        InstallPhase.Failed -> stringResource(R.string.install_tap_retry)
-                        else -> stringResource(R.string.install_tap_start)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.86f),
-                    maxLines = 1,
-                )
-            }
-        }
+            },
+        )
+        BootMenuItem(
+            label = stringResource(R.string.nav_history),
+            highlighted = false,
+            enabled = true,
+            onClick = onHistory,
+        )
+        BootMenuItem(
+            label = stringResource(R.string.settings),
+            highlighted = false,
+            enabled = true,
+            onClick = onSettings,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
 @Composable
-private fun DeviceCard(device: DeviceSnapshot) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        ),
-    ) {
+private fun NeofetchBlock(device: DeviceSnapshot) {
+    val ruleColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.22f)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        HorizontalDivider(color = ruleColor)
         Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp),
         ) {
-            InfoRow(Icons.Rounded.Memory, stringResource(R.string.device), "${device.manufacturer} ${device.model} (${device.device})")
-            InfoRow(Icons.Rounded.Code, stringResource(R.string.firmware), device.buildId)
-            InfoRow(Icons.Rounded.Info, stringResource(R.string.system), "Android ${device.androidRelease} (API ${device.sdk})")
-            InfoRow(Icons.Rounded.Security, stringResource(R.string.system_abi), "${device.abi} (${device.pageSize / 1024}K)")
+            NeofetchRow("os", "Android ${device.androidRelease}")
+            NeofetchRow("host", device.model)
+            NeofetchRow("kernel", device.kernelRelease)
+            NeofetchRow("abi", device.abi)
+            NeofetchRow("mem", device.totalMemLabel)
+            NeofetchRow("uptime", device.uptimeLabel)
         }
+        HorizontalDivider(color = ruleColor)
     }
 }
 
 @Composable
-private fun InfoRow(icon: ImageVector, label: String, value: String) {
-    Row(horizontalArrangement = Arrangement.spacedBy(13.dp)) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Column {
-            Text(label, style = MaterialTheme.typography.titleSmall)
-            Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun NeofetchRow(label: String, value: String) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.width(76.dp),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun BootMenuItem(
+    label: String,
+    highlighted: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.titleLarge,
+        color = when {
+            !enabled -> MaterialTheme.colorScheme.onSurfaceVariant
+            highlighted -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onSurface
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(vertical = 12.dp),
+    )
+}
+
+@Composable
+private fun WatermarkBackground(word: String, modifier: Modifier = Modifier) {
+    val tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f).toArgb()
+    val density = LocalDensity.current
+    Canvas(modifier = modifier) {
+        val paint = android.graphics.Paint().apply {
+            color = tint
+            isAntiAlias = true
+            textSize = with(density) { 20.sp.toPx() }
+            typeface = android.graphics.Typeface.create(
+                android.graphics.Typeface.MONOSPACE,
+                android.graphics.Typeface.ITALIC,
+            )
+        }
+        val gap = with(density) { 18.dp.toPx() }
+        val wordWidth = paint.measureText(word) + gap
+        val lineHeight = paint.textSize + with(density) { 22.dp.toPx() }
+        val canvas = drawContext.canvas.nativeCanvas
+        var row = 0
+        var y = paint.textSize
+        while (y < size.height + lineHeight) {
+            var x = if (row % 2 == 0) 0f else -wordWidth / 2f
+            while (x < size.width) {
+                canvas.drawText(word, x, y, paint)
+                x += wordWidth
+            }
+            y += lineHeight
+            row++
         }
     }
 }
@@ -665,6 +650,7 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
 private fun HistoryPage(
     padding: PaddingValues,
     history: List<InstallHistoryEntry>,
+    onBack: () -> Unit,
 ) {
     var selectedHistoryId by remember { mutableStateOf<String?>(null) }
     val selectedEntry = history.firstOrNull { it.id == selectedHistoryId }
@@ -679,6 +665,7 @@ private fun HistoryPage(
             HistoryList(
                 padding = padding,
                 history = history,
+                onBack = onBack,
                 onEntryClick = { selectedHistoryId = it.id },
             )
         } else {
@@ -695,6 +682,7 @@ private fun HistoryPage(
 private fun HistoryList(
     padding: PaddingValues,
     history: List<InstallHistoryEntry>,
+    onBack: () -> Unit,
     onEntryClick: (InstallHistoryEntry) -> Unit,
 ) {
     LazyColumn(
@@ -703,11 +691,22 @@ private fun HistoryList(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text(
-                text = stringResource(R.string.history_title),
-                style = MaterialTheme.typography.headlineLarge,
+            Row(
                 modifier = Modifier.padding(top = 20.dp, bottom = 14.dp),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.action_back),
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.history_title),
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+            }
         }
         if (history.isEmpty()) {
             item { EmptyHistoryCard() }
@@ -968,6 +967,7 @@ private fun SettingsPage(
     themeMode: AppThemeMode,
     advancedMode: Boolean,
     shizukuMode: Boolean,
+    onBack: () -> Unit,
     onAccentColorChanged: (AccentColor) -> Unit,
     onThemeModeChanged: (AppThemeMode) -> Unit,
     onAdvancedModeChanged: (Boolean) -> Unit,
@@ -1049,13 +1049,25 @@ private fun SettingsPage(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Column(modifier = Modifier.padding(top = 20.dp, bottom = 18.dp)) {
-                Text(stringResource(R.string.settings), style = MaterialTheme.typography.headlineLarge)
-                Text(
-                    stringResource(R.string.version_format, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+            Row(
+                modifier = Modifier.padding(top = 20.dp, bottom = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.action_back),
+                    )
+                }
+                Column {
+                    Text(stringResource(R.string.settings), style = MaterialTheme.typography.headlineLarge)
+                    Text(
+                        stringResource(R.string.version_format, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
         item { SectionLabel(stringResource(R.string.appearance)) }

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Nothing Galaxy Root</string>
+    <string name="boot_tagline">受支援的三星裝置一鍵 root</string>
+    <string name="boot_hint">點擊下方選項開始…</string>
+    <string name="boot_menu_root">Root 裝置</string>
+    <string name="boot_menu_open_manager">開啟 KernelSU Manager</string>
+    <string name="boot_menu_install_manager">安裝 KernelSU Manager</string>
+    <string name="boot_menu_retry">啟動臨時Root</string>
     <string name="nav_overview">首頁</string>
     <string name="nav_history">執行紀錄</string>
     <string name="nav_settings">設定</string>

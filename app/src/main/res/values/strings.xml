@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Nothing Galaxy Root</string>
+    <string name="boot_tagline">One-tap root for supported Samsung devices</string>
+    <string name="boot_hint">Tap an option below to begin…</string>
+    <string name="boot_menu_root">Root device</string>
+    <string name="boot_menu_open_manager">Open KernelSU Manager</string>
+    <string name="boot_menu_install_manager">Install KernelSU Manager</string>
+    <string name="boot_menu_retry">Retry root</string>
     <string name="nav_overview">Home</string>
     <string name="nav_history">History</string>
     <string name="nav_settings">Settings</string>

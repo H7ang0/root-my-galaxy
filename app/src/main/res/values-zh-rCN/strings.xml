@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Nothing Galaxy Root</string><string name="nav_overview">主页</string><string name="nav_history">运行记录</string><string name="nav_settings">设置</string>
+    <string name="boot_tagline">受支持的三星设备一键 root</string>
+    <string name="boot_hint">点击下方选项开始…</string>
+    <string name="boot_menu_root">Root 设备</string>
+    <string name="boot_menu_open_manager">打开 KernelSU Manager</string>
+    <string name="boot_menu_install_manager">安装 KernelSU Manager</string>
+    <string name="boot_menu_retry">启动临时Root</string>
     <string name="install_confirm_title">安装 KernelSU？</string><string name="install_confirm_body">应用将验证设备配置，然后运行内置的 exploit 与 KernelSU payload。</string>
     <string name="action_confirm">确认</string><string name="action_cancel">取消</string><string name="action_close">关闭</string><string name="action_retry">重试</string><string name="action_start_temp_root">启动临时Root</string><string name="action_done">完成</string><string name="action_back">返回</string>
     <string name="install_tap_manager">点击安装 KernelSU Manager</string><string name="install_tap_retry">点击启动临时Root</string><string name="install_tap_start">点击安装 KernelSU</string>
