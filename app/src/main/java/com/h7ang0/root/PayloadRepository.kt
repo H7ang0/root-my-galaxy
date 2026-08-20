@@ -8,16 +8,15 @@ import java.io.FileOutputStream
 data class VerifiedPayloads(
     val profile: TargetProfile,
     val exploit: File,
+    val rootHelper: File,
     val kernelSu: File,
 )
 
 /**
  * Offline payload repository.
  *
- * Nothing Galaxy Root ships a single verified payload for
- * SM-S9280 / S9280ZCS6DZF2. The support manifest and both artifacts are
- * bundled under assets/, so no network is required and no other device or
- * firmware profile can ever be selected.
+ * Nothing Galaxy Root ships the RootMyS24 CVE-2026-43499 payload set
+ * directly under assets/, so no network is required at install time.
  */
 class PayloadRepository(private val context: Context) {
     fun loadTargets(): List<TargetProfile> {
@@ -39,19 +38,26 @@ class PayloadRepository(private val context: Context) {
         val directory = File(context.filesDir, "payloads/${profile.profileId}").apply { mkdirs() }
         val exploit = copyArtifact(
             profile.exploit,
-            File(directory, "cve-2026-43499-app.so"),
+            File(directory, EXPLOIT_NAME),
             context.getString(R.string.artifact_exploit),
+            onProgress,
+        )
+        val rootHelper = copyAsset(
+            ROOT_HELPER_NAME,
+            File(directory, ROOT_HELPER_NAME),
+            context.getString(R.string.artifact_root_helper),
             onProgress,
         )
         val kernelSu = copyArtifact(
             profile.kernelSu,
-            File(directory, "ksud-s9280-kdp"),
+            File(directory, KSUD_NAME),
             context.getString(R.string.artifact_kernelsu),
             onProgress,
         )
         Os.chmod(exploit.absolutePath, 0b100100100)
+        Os.chmod(rootHelper.absolutePath, 0b100100100)
         Os.chmod(kernelSu.absolutePath, 0b100100100)
-        return VerifiedPayloads(profile, exploit, kernelSu)
+        return VerifiedPayloads(profile, exploit, rootHelper, kernelSu)
     }
 
     private fun copyArtifact(
@@ -97,11 +103,39 @@ class PayloadRepository(private val context: Context) {
         require(url.startsWith(ASSET_PREFIX)) { context.getString(R.string.repo_url_invalid) }
         val path = url.removePrefix(ASSET_PREFIX)
         require(!path.contains("..")) { context.getString(R.string.repo_url_invalid) }
-        return "payloads/$path"
+        return path
+    }
+
+    private fun copyAsset(
+        assetPath: String,
+        destination: File,
+        label: String,
+        onProgress: (String) -> Unit,
+    ): File {
+        onProgress(context.getString(R.string.repo_downloading, label))
+        val temporary = File(destination.parentFile, "${destination.name}.part")
+        context.assets.open(assetPath).use { input ->
+            FileOutputStream(temporary).use { output ->
+                input.copyTo(output)
+                output.fd.sync()
+            }
+        }
+        require(temporary.length() > 0) {
+            context.getString(R.string.repo_incomplete, label)
+        }
+        if (destination.exists()) destination.delete()
+        require(temporary.renameTo(destination)) {
+            context.getString(R.string.repo_finalize_failed, label)
+        }
+        onProgress(context.getString(R.string.repo_verified, label))
+        return destination
     }
 
     companion object {
         private const val MANIFEST_ASSET = "support/targets-v3.json"
         private const val ASSET_PREFIX = "asset://"
+        private const val EXPLOIT_NAME = "cve-2026-43499"
+        private const val ROOT_HELPER_NAME = "cve-2026-43499-root"
+        private const val KSUD_NAME = "ksud-selected"
     }
 }

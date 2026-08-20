@@ -160,7 +160,7 @@
     <string name="about_description">關於 Nothing Galaxy Root</string>
     <string name="about_body">作者：H7ang0，基於 Root-My-Galaxy 開發。\n交流群請加 H7ang0 微信，備註來意。</string>
     <string name="about_contact">交流群：微信添加 H7ang0，備註來意。</string>
-    <string name="about_target">本版本僅支援 SM-S9280 / S9280ZCS6DZF2。</string>
+    <string name="about_target">本版本使用 RootMyS24 的 CVE-2026-43499 載荷，面向 S24 系列 DZF2 韌體。</string>
     <string name="history_payload">Payload: %1$s</string>
     <string name="export_log">匯出日誌</string>
     <string name="export_log_saved">日誌已儲存</string>

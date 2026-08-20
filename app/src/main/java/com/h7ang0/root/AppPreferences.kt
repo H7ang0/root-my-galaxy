@@ -72,15 +72,18 @@ object AppPreferences {
     }
 
     fun shizukuMode(context: Context): Boolean =
-        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-            .getBoolean(SHIZUKU_MODE, false)
+        true
 
     fun setShizukuMode(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
             .edit()
-            .putBoolean(SHIZUKU_MODE, enabled)
+            .putBoolean(SHIZUKU_MODE, true)
             .apply()
     }
+
+    fun autoScreenOff(context: Context): Boolean =
+        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+            .getBoolean("auto_screen_off", true)
 
     @Synchronized
     fun consumeInstallRequest(context: Context, requestId: String?): Boolean {

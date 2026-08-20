@@ -87,17 +87,41 @@ object ShizukuController {
         }
     }
 
+    fun shell(cmd: String): Pair<Int, String> {
+        val process = exec(arrayOf("/system/bin/sh", "-c", cmd))
+        return try {
+            val out = process.inputStream.bufferedReader().use { it.readText() } +
+                process.errorStream.bufferedReader().use { it.readText() }
+            process.waitFor() to out
+        } finally {
+            if (process.isAlive) process.destroy()
+        }
+    }
+
     fun writeFile(remotePath: String, mode: String, source: InputStream) {
-        val process = exec(arrayOf("sh", "-c", "cat > '$remotePath' && chmod $mode '$remotePath'"))
+        val process = exec(
+            arrayOf(
+                "sh",
+                "-c",
+                "rm -f '$remotePath' 2>/dev/null; cat > '$remotePath' && chmod $mode '$remotePath'",
+            ),
+        )
+        val err = StringBuilder()
         val exitCode = try {
             process.outputStream.use { output ->
                 source.use { input -> input.copyTo(output, DEFAULT_BUFFER_SIZE) }
             }
+            val errorReader = process.errorStream.bufferedReader()
+            Thread {
+                errorReader.forEachLine { err.append(it).append('\n') }
+            }.start()
             process.waitFor()
         } finally {
             if (process.isAlive) process.destroy()
         }
-        check(exitCode == 0) { "Failed to stage $remotePath (exit $exitCode)" }
+        check(exitCode == 0) {
+            "Failed to stage $remotePath (exit $exitCode)${if (err.isNotBlank()) ": $err" else ""}"
+        }
     }
 
     private class RemoteProcess(private val remote: IRemoteProcess) : Process() {

@@ -77,7 +77,7 @@
     <string name="about_description">About Nothing Galaxy Root</string>
     <string name="about_body">Author: H7ang0, developed based on Root-My-Galaxy.\nFor the user group, add H7ang0 on WeChat and state your purpose.</string>
     <string name="about_contact">User group: add H7ang0 on WeChat and state your purpose.</string>
-    <string name="about_target">This build supports SM-S9280 / S9280ZCS6DZF2 only.</string>
+    <string name="about_target">This build uses the RootMyS24 CVE-2026-43499 payload set for S24-series DZF2 firmware.</string>
 
     <string name="install_title">Install</string>
     <string name="install_keep_open">Keep this screen open until installation finishes</string>
@@ -108,11 +108,18 @@
     <string name="status_ksu_loading">Late-loading KernelSU</string>
     <string name="status_install_failed">Installation failed</string>
     <string name="log_profile">[+] Support profile: %1$s</string>
-    <string name="log_download_verified">[+] Payload download complete</string>
+    <string name="log_download_verified">[+] Payload extraction complete</string>
     <string name="log_install_complete">[+] Installation complete</string>
     <string name="log_bootstrap_root">[+] Bootstrap root acquired</string>
     <string name="log_ksu_staged">[+] KernelSU staging complete</string>
     <string name="log_ksu_control_verified">[+] KernelSU control channel verified</string>
+    <string name="log_cleanup">[*] Cleaning stale exploit state</string>
+    <string name="log_cleanup_done">[+] Cleanup complete (rc=%1$d)</string>
+    <string name="log_diag">[*] pipe-max-size=%1$s pipe-user-pages=%2$s</string>
+    <string name="log_diag_version">[*] kernel=%1$s</string>
+    <string name="log_pipe_warn">[!] pipe-max-size is low: %1$d</string>
+    <string name="log_screen_off">[*] Screen turned off for exploit stability</string>
+    <string name="log_success_milestone">[+] Root success count: %1$d</string>
     <string name="error_helper_unavailable">The bootstrap helper is not executable</string>
     <string name="error_exploit_stalled">The exploit log did not advance for 90 seconds</string>
     <string name="error_exploit_timeout">The exploit exceeded the 15-minute limit</string>
@@ -124,6 +131,7 @@
     <string name="error_receipt">Unable to save the installation verification receipt</string>
 
     <string name="artifact_exploit">exploit</string>
+    <string name="artifact_root_helper">root helper</string>
     <string name="artifact_kernelsu">KernelSU</string>
     <string name="repo_no_profile">No compatible payload supports this model and kernel version</string>
     <string name="repo_downloading">Downloading %1$s</string>
@@ -144,7 +152,7 @@
     <string name="advanced_mode">Advanced mode</string>
     <string name="advanced_mode_description">Manually choose a device-compatible payload during installation</string>
     <string name="shizuku_mode">Use Shizuku</string>
-    <string name="shizuku_mode_description">Use Shizuku to run the payload. This can improve reliability.</string>
+    <string name="shizuku_mode_description">RootMyS24 payload execution requires Shizuku shell permission.</string>
     <string name="shizuku_not_running_title">Shizuku is not running</string>
     <string name="shizuku_not_running_body">Start the Shizuku service with adb or root and grant this app permission, then enable this option.</string>
     <string name="action_download_shizuku">Download Shizuku</string>

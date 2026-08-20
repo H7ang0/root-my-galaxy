@@ -2,20 +2,22 @@
   "schemaVersion": 3,
   "payloads": [
     {
-      "payloadId": "e3q-S9280ZCS6DZF2",
-      "displayName": "Galaxy S24 Ultra (SM-S9280) | Kernel 6.1.145 [offline]",
+      "payloadId": "rootmys24-e3q-DZF2",
+      "displayName": "Galaxy S24 Series (SM-S9210 / SM-S9260 / SM-S9280) | DZF2",
       "models": [
+        "SM-S9210",
+        "SM-S9260",
         "SM-S9280"
       ],
       "kernelVersions": [
         "6.1.145"
       ],
       "exploit": {
-        "url": "asset://e3q-S9280ZCS6DZF2/cve-2026-43499-app.so",
+        "url": "asset://cve-2026-43499",
         "size": 104128
       },
       "kernelsu": {
-        "url": "asset://e3q-S9280ZCS6DZF2/ksud-s9280-kdp",
+        "url": "asset://ksud-selected",
         "size": 4879856
       }
     }

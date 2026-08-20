@@ -1102,22 +1102,18 @@ private fun SettingsPage(
                     icon = Icons.Rounded.VerifiedUser,
                     title = stringResource(R.string.shizuku_mode),
                     description = stringResource(R.string.shizuku_mode_description),
-                    checked = shizukuMode,
+                    checked = true,
                     position = SettingsCardPosition.Bottom,
-                    onCheckedChange = { enabled ->
-                        if (!enabled) {
-                            onShizukuModeChanged(false)
-                        } else {
-                            scope.launch {
-                                ShizukuController.pingUntilRunning()
-                                if (ShizukuController.isRunning()) {
-                                    onShizukuModeChanged(true)
-                                    if (!ShizukuController.isGranted()) {
-                                        ShizukuController.requestPermission()
-                                    }
-                                } else {
-                                    showShizukuMissingDialog = true
+                    onCheckedChange = {
+                        scope.launch {
+                            ShizukuController.pingUntilRunning()
+                            if (ShizukuController.isRunning()) {
+                                onShizukuModeChanged(true)
+                                if (!ShizukuController.isGranted()) {
+                                    ShizukuController.requestPermission()
                                 }
+                            } else {
+                                showShizukuMissingDialog = true
                             }
                         }
                     },
