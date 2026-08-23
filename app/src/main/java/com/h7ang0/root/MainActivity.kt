@@ -60,6 +60,7 @@ import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.History
@@ -431,6 +432,7 @@ private fun RootApp(
                         padding = padding,
                         history = history,
                         onBack = { selectedPage = AppPage.Overview },
+                        onDeleteEntry = installViewModel::deleteHistory,
                     )
                     AppPage.Settings -> SettingsPage(
                         padding = padding,
@@ -651,6 +653,7 @@ private fun HistoryPage(
     padding: PaddingValues,
     history: List<InstallHistoryEntry>,
     onBack: () -> Unit,
+    onDeleteEntry: (InstallHistoryEntry) -> Unit,
 ) {
     var selectedHistoryId by remember { mutableStateOf<String?>(null) }
     val selectedEntry = history.firstOrNull { it.id == selectedHistoryId }
@@ -673,6 +676,10 @@ private fun HistoryPage(
                 padding = padding,
                 entry = entry,
                 onBack = { selectedHistoryId = null },
+                onDelete = { deletedEntry ->
+                    selectedHistoryId = null
+                    onDeleteEntry(deletedEntry)
+                },
             )
         }
     }
@@ -792,13 +799,43 @@ private fun HistoryDetail(
     padding: PaddingValues,
     entry: InstallHistoryEntry,
     onBack: () -> Unit,
+    onDelete: (InstallHistoryEntry) -> Unit,
 ) {
     val context = LocalContext.current
+    var showDeleteDialog by remember { mutableStateOf(false) }
     val exportLogLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         result.data?.data?.let { uri -> saveRunLog(context, uri, entry) }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            icon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
+            title = {
+                DialogDimAmount(0.24f)
+                Text(stringResource(R.string.delete_history_title))
+            },
+            text = { Text(stringResource(R.string.delete_history_body)) },
+            confirmButton = {
+                FilledTonalButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete(entry)
+                    },
+                ) {
+                    Text(stringResource(R.string.delete_history_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(padding),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
@@ -818,6 +855,11 @@ private fun HistoryDetail(
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.weight(1f),
                 )
+                if (entry.result != InstallRunResult.Running) {
+                    IconButton(onClick = { showDeleteDialog = true }) {
+                        Icon(Icons.Rounded.Delete, contentDescription = stringResource(R.string.delete_history))
+                    }
+                }
                 IconButton(onClick = {
                     exportLogLauncher.launch(
                         Intent(Intent.ACTION_CREATE_DOCUMENT).apply {

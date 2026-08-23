@@ -69,6 +69,10 @@
     <string name="history_payload">Payload: %1$s</string>
     <string name="history_shizuku_used">Shizuku: used</string>
     <string name="history_shizuku_not_used">Shizuku: not used</string>
+    <string name="delete_history">Delete run</string>
+    <string name="delete_history_title">Delete this run?</string>
+    <string name="delete_history_body">This will permanently delete this run record and its saved log.</string>
+    <string name="delete_history_confirm">Delete</string>
     <string name="export_log">Export log</string>
     <string name="export_log_saved">Log saved</string>
     <string name="export_log_failed">Unable to save the log</string>
@@ -119,6 +123,7 @@
     <string name="log_diag_version">[*] kernel=%1$s</string>
     <string name="log_pipe_warn">[!] pipe-max-size is low: %1$d</string>
     <string name="log_screen_off">[*] Screen turned off for exploit stability</string>
+    <string name="log_post_boot_wait">[*] Waiting %1$d seconds for post-boot allocator quiet window (uptime=%2$d)</string>
     <string name="log_success_milestone">[+] Root success count: %1$d</string>
     <string name="error_helper_unavailable">The bootstrap helper is not executable</string>
     <string name="error_exploit_stalled">The exploit log did not advance for 90 seconds</string>

@@ -59,6 +59,10 @@
     <string name="history_started">開始：%1$s</string>
     <string name="history_completed">完成：%1$s</string>
     <string name="history_log_empty">尚無日誌輸出。</string>
+    <string name="delete_history">刪除紀錄</string>
+    <string name="delete_history_title">刪除此筆紀錄？</string>
+    <string name="delete_history_body">這會永久刪除這次執行紀錄與儲存的日誌。</string>
+    <string name="delete_history_confirm">刪除</string>
 
     <string name="install_title">安裝</string>
     <string name="install_keep_open">安裝完成前請保持此畫面開啟</string>

@@ -66,6 +66,12 @@ class InstallHistoryStore(private val context: Context) {
         }
     }
 
+    fun delete(id: String): Boolean {
+        if (!SAFE_HISTORY_ID.matches(id)) return false
+        val target = File(directory, "$id.json")
+        return !target.exists() || target.delete()
+    }
+
     private fun encode(entry: InstallHistoryEntry) = JSONObject()
         .put("id", entry.id)
         .put("startedAtMillis", entry.startedAtMillis)
@@ -103,5 +109,9 @@ class InstallHistoryStore(private val context: Context) {
             },
             usedShizuku = value.optBoolean("usedShizuku", false),
         )
+    }
+
+    companion object {
+        private val SAFE_HISTORY_ID = Regex("[0-9a-fA-F-]{36}")
     }
 }

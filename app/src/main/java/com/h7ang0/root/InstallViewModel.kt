@@ -121,6 +121,15 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun deleteHistory(entry: InstallHistoryEntry) {
+        if (entry.result == InstallRunResult.Running || activeHistoryEntry?.id == entry.id) return
+        viewModelScope.launch(Dispatchers.IO) {
+            if (historyStore.delete(entry.id)) {
+                mutableHistory.value = mutableHistory.value.filterNot { it.id == entry.id }
+            }
+        }
+    }
+
     fun install(profileId: String? = null) {
         if (installJob?.isActive == true || mutableState.value.phase == InstallPhase.Installed) return
         discoveryJob?.cancel()
@@ -176,7 +185,7 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private suspend fun executeExploit(payloads: VerifiedPayloads) {
-        val logPrefix = mutableState.value.log
+        waitForPostBootQuietWindow()
         val stagedPayload = shizukuStage(payloads.exploit, SHIZUKU_PAYLOAD_PATH, "755")
         shizukuStage(payloads.rootHelper, SHIZUKU_ROOT_HELPER_PATH, "755")
         shizukuStage(payloads.kernelSu, SHIZUKU_KSUD_SELECTED_PATH, "755")
@@ -193,6 +202,7 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
             ShizukuController.shell("input keyevent 26")
             appendLog(app.getString(R.string.log_screen_off))
         }
+        val logPrefix = mutableState.value.log
         val process = ShizukuController.exec(
             arrayOf("/system/bin/sh", "-c", "true"),
             shizukuEnvironment(stagedPayload.absolutePath),
@@ -241,6 +251,14 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
             }
         }
         appendLog(app.getString(R.string.log_bootstrap_root))
+    }
+
+    private suspend fun waitForPostBootQuietWindow() {
+        val uptimeSeconds = SystemClock.elapsedRealtime() / 1_000L
+        val waitSeconds = POST_BOOT_QUIET_SECONDS - uptimeSeconds
+        if (waitSeconds <= 0) return
+        appendLog(app.getString(R.string.log_post_boot_wait, waitSeconds, uptimeSeconds))
+        delay(waitSeconds * 1_000L)
     }
 
     private fun drainProcessOutput(process: Process, buffer: StringBuilder): String {
@@ -430,7 +448,8 @@ class InstallViewModel(application: Application) : AndroidViewModel(application)
 
     companion object {
         private const val EXPLOIT_ATTEMPTS = "30"
-        private const val EXPLOIT_TOTAL_MILLIS = 900_000L
+        private const val EXPLOIT_TOTAL_MILLIS = 2_700_000L
+        private const val POST_BOOT_QUIET_SECONDS = 300L
         private const val INSTALL_RECEIPT = "install_receipt"
         private const val RECEIPT_BOOT_TOKEN = "kernel_boot_id"
         private const val RECEIPT_VERIFIED = "verified"
